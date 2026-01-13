@@ -1,7 +1,7 @@
 {
   "description": "Ubuntu desktop with basic tools for forensic work",
   "docker_registry": "https://index.docker.io/v1/",
-  "image_src": "vs-code.png",
+  "image_src": "https://github.com/edgeworks/kasm-registry/tree/1.1/workspaces/Analyst-Desktop/forensic-icon.png",
   "categories": [
     "Development"
   ],
@@ -12,23 +12,13 @@
   ],
   "compatibility": [
     {
-      "version": "1.16.x",
-      "image": "kasmweb/vs-code:1.16",
-      "uncompressed_size_mb": 2428,
-      "available_tags": [
-        "develop",
-        "1.16.0"
-      ]
-
+      "version": "1.16.x"
     },
     {
-      "version": "1.17.x",
-      "image": "kasmweb/vs-code:1.17",
-      "uncompressed_size_mb": 2528,
-      "available_tags": [
-        "develop",
-        "1.17.0"
-      ]
+      "version": "1.17.x"
+    },
+    {
+      "version": "1.18.x"
     }
   ]
 }
