@@ -1,7 +1,7 @@
 {
   "description": "Ubuntu desktop with basic tools for forensic work",
   "docker_registry": "https://index.docker.io/v1/",
-  "image_src": "https://github.com/edgeworks/kasm-registry/tree/1.1/workspaces/Analyst-Desktop/forensic-icon.png",
+  "image_src": "forensic-icon.png",
   "categories": [
     "Development"
   ],
