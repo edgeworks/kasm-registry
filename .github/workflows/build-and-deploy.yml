@@ -3,24 +3,102 @@ name: Build
 on:
   push:
     branches-ignore:
-      - 'gh-pages'
+      - "gh-pages"
+  schedule:
+    - cron: "0 3 * * 0" # Sunday 03:00 UTC (weekly rebuild to track rolling-weekly)
+
 permissions:
   contents: write
+
 jobs:
-  build:
+  # -----------------------------
+  # GitHub Pages build + deploy
+  # -----------------------------
+  pages:
+    name: Build & Deploy GitHub Pages
+    runs-on: ubuntu-latest
+    # Only run Pages deployment on push (not on schedule)
+    if: github.event_name == 'push'
+
+    steps:
+      - uses: actions/checkout@v3
+
+      # Skip Pages deploy if only Docker image context changed.
+      - name: Detect changes (Pages)
+        id: changes
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            pages:
+              - 'processing/**'
+              - 'site/**'
+              - 'workspaces/**'
+              - 'icons/**'
+              - 'build_all_branches.sh'
+              - 'package.json'
+              - 'package-lock.json'
+              - '.github/workflows/build-and-deploy.yml'
+
+      - name: Build
+        if: steps.changes.outputs.pages == 'true'
+        run: |
+          npm ci --prefix processing
+          npm ci --prefix site
+          ./build_all_branches.sh
+
+      - name: Deploy
+        if: steps.changes.outputs.pages == 'true'
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          branch: gh-pages
+          folder: public
+
+  # -----------------------------
+  # Docker image build + push
+  # -----------------------------
+  docker:
+    name: Build & Push Docker Image (Analyst Desktop)
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v3
 
-      - name: Build # Have to run processing first so the list.json exists to be included in the the deploy
-        run: |
-          npm ci --prefix processing 
-          npm ci --prefix site
-          ./build_all_branches.sh
-
-      - name: Deploy
-        uses: JamesIves/github-pages-deploy-action@v4
+      # On push: only run Docker build when the image context changes.
+      # On schedule: always run.
+      - name: Detect changes (Docker)
+        id: changes
+        if: github.event_name == 'push'
+        uses: dorny/paths-filter@v3
         with:
-          branch: gh-pages
-          folder: public
+          filters: |
+            docker:
+              - 'images/analyst-desktop/**'
+              - '.github/workflows/build-and-deploy.yml'
+
+      - name: Compute date tag
+        id: vars
+        # Run if schedule OR docker paths changed
+        if: github.event_name == 'schedule' || steps.changes.outputs.docker == 'true'
+        run: echo "DATE_TAG=$(date -u +%Y%m%d)" >> $GITHUB_OUTPUT
+
+      - name: Set up Docker Buildx
+        if: github.event_name == 'schedule' || steps.changes.outputs.docker == 'true'
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Docker Hub
+        if: github.event_name == 'schedule' || steps.changes.outputs.docker == 'true'
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push
+        if: github.event_name == 'schedule' || steps.changes.outputs.docker == 'true'
+        uses: docker/build-push-action@v6
+        with:
+          context: ./images/analyst-desktop
+          file: ./images/analyst-desktop/Dockerfile
+          push: true
+          tags: |
+            eegor/analyst-desktop:1.18.0-rolling-weekly
+            eegor/analyst-desktop:1.18.0-rolling-weekly-${{ steps.vars.outputs.DATE_TAG }}

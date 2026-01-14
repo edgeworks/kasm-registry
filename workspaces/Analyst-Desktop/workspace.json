@@ -1,24 +1,16 @@
 {
-  "description": "Ubuntu desktop with basic tools for forensic work",
+  "description": "Analyst Desktop based on Kasm Ubuntu Noble Desktop with basic analysis and network utilities preinstalled.",
   "docker_registry": "https://index.docker.io/v1/",
   "image_src": "forensic-icon.png",
-  "categories": [
-    "Development"
-  ],
-  "friendly_name": "Analyst Desktop",
-  "architecture": [
-    "amd64",
-    "arm64"
-  ],
+  "categories": ["Security", "Analysis"],
+  "friendly_name": "Analyst-Desktop",
+  "architecture": ["amd64"],
   "compatibility": [
     {
-      "version": "1.16.x"
-    },
-    {
-      "version": "1.17.x"
-    },
-    {
-      "version": "1.18.x"
+      "version": "1.18.x",
+      "image": "eegor/analyst-desktop:1.18.0-rolling-weekly",
+      "uncompressed_size_mb": 0,
+      "available_tags": ["1.18.0-rolling-weekly"]
     }
   ]
 }
