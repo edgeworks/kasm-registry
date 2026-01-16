@@ -15,6 +15,15 @@ RUN apt-get update \
       tcpdump \
       thunderbird \
       libemail-outlook-message-perl \
+      libemail-address-perl \
+      libimage-exiftool-perl \
+      ripole \
+      unzip \
+      libxml2-utils \
+      file \
+      pst-utils \
+      poppler-utils \
+      qpdf \
       python3 \
       python3-pip \
       pipx \
@@ -28,9 +37,9 @@ ENV PIPX_HOME=/opt/pipx
 ENV PIPX_BIN_DIR=/usr/local/bin
 RUN mkdir -p /opt/pipx
 
-# Non-repo tools (lightweight)
 RUN pipx install oletools \
- && pipx install peepdf-3
+ && pipx install peepdf-3 \
+ && pipx install msoffcrypto-tool
 
 # ------------------------------------------------------------
 # ######### End Customizations ###########
