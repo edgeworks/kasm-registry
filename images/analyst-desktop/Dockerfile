@@ -9,7 +9,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 RUN set -eux \
 && apt-get update \
-&& apt-get install -y --no-install-recommends \
+&& sudo apt-get install -y --no-install-recommends \
       glances \
       wget \
       net-tools \
@@ -18,18 +18,22 @@ RUN set -eux \
       libemail-outlook-message-perl \
       libemail-address-perl \
       libimage-exiftool-perl \
-      ripole \
       unzip \
       libxml2-utils \
       file \
       pst-utils \
       poppler-utils \
       qpdf \
+      p7zip-full \
+      binwalk \
+      cabextract \
       python3 \
       python3-pip \
       pipx \
       ca-certificates \
       curl \
+      netcat-openbsd \
+      telnet \
  && apt-get clean \
  && rm -rf /var/lib/apt/lists/*
 
